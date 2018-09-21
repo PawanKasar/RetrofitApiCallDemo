@@ -1,5 +1,6 @@
 package com.demo.retrofitapicallingdemo.Activities;
 
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     ModelClass modelClass;
     RecyclerView recyclerView;
     CustomeAdapter customeAdapter;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,12 @@ public class MainActivity extends AppCompatActivity {
 
         modelClassArrayList = new ArrayList<>();
         recyclerView = findViewById(R.id.recyclerView);
+
+        pd = new ProgressDialog(MainActivity.this);
+        pd.setMessage("Wait..");
+        pd.setCancelable(false);
+        pd.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+        pd.show();
 
         fetchServerData();
 
@@ -64,12 +72,14 @@ public class MainActivity extends AppCompatActivity {
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setAdapter(customeAdapter);
+                pd.dismiss();
             }
 
             @Override
             public void onFailure(Call<List<ModelClass>> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.d("MainActivity","Getting Failure Response "+t.getMessage());
+                pd.dismiss();
             }
         });
     }

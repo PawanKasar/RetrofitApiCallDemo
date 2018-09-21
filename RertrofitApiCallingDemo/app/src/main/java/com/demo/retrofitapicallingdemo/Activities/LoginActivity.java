@@ -1,5 +1,6 @@
 package com.demo.retrofitapicallingdemo.Activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +14,10 @@ import android.widget.Toast;
 import com.demo.retrofitapicallingdemo.Interfaces.ApiInterface;
 import com.demo.retrofitapicallingdemo.Model.LoginModel;
 import com.demo.retrofitapicallingdemo.R;
+import com.demo.retrofitapicallingdemo.Session.SessionManager;
 import com.demo.retrofitapicallingdemo.Utils.ApiCall;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -28,6 +32,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button btn_login;
 
     ActionBar actionBar;
+    ProgressDialog pd;
+
+    //Session Manager Initialize
+    SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +43,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
         initVeiws();
         initActioBar();
+
+        //Here I am checking that user is login or not
+        checkIsUserLogin();
     }
 
     /**
@@ -45,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         edt_password = findViewById(R.id.edt_userpassword);
         btn_login = findViewById(R.id.btn_login);
         btn_login.setOnClickListener(this);
+
+        sessionManager = new SessionManager(LoginActivity.this);
     }
 
     public void initActioBar(){
@@ -63,6 +76,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         switch (id){
             case R.id.btn_login:
+                pd = new ProgressDialog(LoginActivity.this);
+                pd.setMessage("Wait..");
+                pd.setCancelable(false);
+                pd.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+                pd.show();
                 LoginRequest();
                 break;
         }
@@ -79,12 +97,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (response.isSuccessful()){
                     try {
                         if (response.body() != null) {
+                            pd.dismiss();
                             String strResponse = response.body().string();
-                            Log.e("LoginActivity","Getting Response "+strResponse);
+                            JSONObject jsonObject = new JSONObject(strResponse);
+                            String token = jsonObject.getString("token");
+                            Log.e("LoginActivity","Getting_token "+token);
+                            sessionManager.createLoginSession(token);
                             openActivity();
                         }
-                    }catch (IOException ioe){
+                    }catch (Exception ioe){
                         ioe.printStackTrace();
+                        pd.dismiss();
                     }
                 }
             }
@@ -93,12 +116,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.d("LoginActivity","Getting Failure Response "+t.getMessage());
+                pd.dismiss();
             }
         });
     }
 
     private void openActivity(){
         startActivity(new Intent(LoginActivity.this,MainActivity.class));
+        finish();
+    }
+
+    public void checkIsUserLogin(){
+        if (!sessionManager.isLoggedIn()){
+            Toast.makeText(LoginActivity.this,"Session not stored",Toast.LENGTH_SHORT).show();
+        }else{
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
     }
 
 }
