@@ -17,7 +17,7 @@
         android:paddingRight="24dp">
 
         <ImageView
-            android:src="@drawable/ic_launcher_background"
+            android:src="@drawable/deadpool"
             android:layout_width="wrap_content"
             android:layout_height="72dp"
             android:layout_marginBottom="24dp"
@@ -26,8 +26,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/login_username">
 
             <EditText
                 android:id="@+id/edt_useremailaddress"
@@ -41,8 +41,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/login_username">
 
             <EditText
                 android:id="@+id/edt_userpassword"
